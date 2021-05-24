@@ -1,8 +1,15 @@
+set.seed(29)
+
+# Loading packages --------------------------------------------------------
+
 library(tidyverse)
 library(nonlinearTseries)
 library(zoo)
 library(lattice)
 library(tseries)
+
+
+# Loading dataset ---------------------------------------------------------
 
 # Import wolf_sheep_grasspredation.csv
 df <- read.csv("wolf_sheep_grasspredation.csv", header = 1, skip = 23, col.names = c('', 'time', 'sheep', 'wolves', 'grass'))
