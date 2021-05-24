@@ -10,62 +10,51 @@ library(ecp)
 # Loading dataset ---------------------------------------------------------
 
 #Loading dataset produced by NetLogo and selecting right timeframe
-df_1 <- read.csv('wolf_sheep_grass_unstable.csv', skip = 23, col.names = c('', 'time', 'sheep', 'wolves', 'grass'))
-df_1[,1] <- NULL
-df_1 <- df_1[23000:28000,]
+df <- read.csv('wolf_sheep_grass_unstable.csv', skip = 23, col.names = c('', 'time', 'sheep', 'wolves', 'grass'))
+df[,1] <- NULL
+df <- df[23000:28000,]
 
 #Plotting the selected timeframe in the dataset
-ggplot(data = df_1, aes(x = time)) + 
+ggplot(data = df, aes(x = time)) + 
   scale_colour_hue() +
   geom_line(aes(y = sheep, color = 'Sheep')) +
   geom_line(aes(y = wolves, color = 'Wolves')) +
   geom_line(aes(y = grass, color = 'Grass')) +
   xlab('Time') +
-  ylab('Number') +
+  ylab('Count') +
   ggtitle('Regime shift in predator-prey dataset')
 
 
-# MEMORY ------------------------------------------------------------------
-
-
-# Bartels_Rank Tests ------------------------------------------------------
+# Memory ------------------------------------------------------------------
 
 #Performing Bartels-Rank tests against non-randomness
-sheep_bartels_rank <- bartels.rank.test(df_1$sheep, alternative = "two.sided")
-wolves_bartels_rank <- bartels.rank.test(df_1$wolves, alternative = "two.sided")
-grass_bartels_rank <- bartels.rank.test(df_1$grass, alternative = "two.sided")
+sheep_bartels_rank <- bartels.rank.test(df$sheep, alternative = "two.sided")
+wolves_bartels_rank <- bartels.rank.test(df$wolves, alternative = "two.sided")
+grass_bartels_rank <- bartels.rank.test(df$grass, alternative = "two.sided")
 
-#Show outcome of tests
-sheep_bartels_rank
-wolves_bartels_rank
-grass_bartels_rank
-
-# Autocorrelation Function ------------------------------------------------
-
-# Calculate Partial Autocorrelation & length of timeseries
-sheep_pacf <- pacf(df_1$sheep, lag.max = 900, main = 'Sheep Partial Autocorrelation Plot')
-N <-length(df_1$sheep)  
-# Number of values passing two-tailed Z-test treshold
+#Calculate Partial Autocorrelation & length of timeseries
+sheep_pacf <- pacf(df$sheep, lag.max = 900, main = 'Sheep Partial Autocorrelation Plot')
+N <-length(df$sheep)  
+#Number of values passing two-tailed Z-test treshold
 sheep_memory_values <- length(which(abs(sheep_pacf$acf) > (2 / sqrt(N))))
-# Max lag for long-term memory
+#Max lag for long-term memory
 sheep_max_lag <- max(which(abs(sheep_pacf$acf) > (2 / sqrt(N))))
 
-# Show number of lags & maximum lag
+#Show number of lags & maximum lag
 sheep_memory_values
 sheep_max_lag
 
 #Repeat process
-
-wolves_pacf <- pacf(df_1$wolves, lag.max = 900, main = 'Wolves Partial Autocorrelation Plot')
-N <-length(df_1$wolves)  
+wolves_pacf <- pacf(df$wolves, lag.max = 900, main = 'Wolves Partial Autocorrelation Plot')
+N <-length(df$wolves)  
 wolves_memory_values <- length(which(abs(wolves_pacf$acf) > (2 / sqrt(N))))
 wolves_max_lag <- max(which(abs(wolves_pacf$acf) > (2 / sqrt(N))))
 
 wolves_memory_values
 wolves_max_lag
 
-grass_pacf <- pacf(df_1$grass, lag.max = 900, main = 'Grass Partial Autocorrelation Plot')
-N <-length(df_1$grass)  
+grass_pacf <- pacf(df$grass, lag.max = 900, main = 'Grass Partial Autocorrelation Plot')
+N <-length(df$grass)  
 grass_memory_values <- length(which(abs(grass_pacf$acf) > (2 / sqrt(N))))
 grass_max_lag <- max(which(abs(grass_pacf$acf) > (2 / sqrt(N))))
 
@@ -73,52 +62,24 @@ grass_memory_values
 grass_max_lag
 
 
-# REGIME SHIFTS -----------------------------------------------------------
-
-
-
-# Performing KPSS ---------------------------------------------------------
+# Regime shift ------------------------------------------------------------
 
 #KPSS test for trend stationarity -> shows non-stationarity
-sheep_kpss <- kpss.test(df_1$sheep, null = 'Trend')
-wolves_kpss <- kpss.test(df_1$wolves, null = 'Trend')
-grass_kpss <- kpss.test(df_1$grass, null = 'Trend')
+sheep_kpss <- kpss.test(df$sheep, null = 'Trend')
+wolves_kpss <- kpss.test(df$wolves, null = 'Trend')
+grass_kpss <- kpss.test(df$grass, null = 'Trend')
 
-sheep_kpss
-wolves_kpss
-grass_kpss
-
-
-# Detrending timeseries ---------------------------------------------------
-
+#Detrending time-series
 df_2 <- data.frame(rep(NA, 4999))
 df_2$detrend_sheep <- NA
 df_2$detrend_wolves <- NA
 df_2$detrend_grass <- NA
 df_2[,1] <- NULL
 
-df_2$detrend_sheep <- diff(x = df_1$sheep, lag = 1, differences = 2)
-df_2$detrend_wolves <- diff(x = df_1$wolves, lag = 1, differences = 2)
-df_2$detrend_grass <- diff(x = df_1$grass, lag = 1, differences = 2)
+df_2$detrend_sheep <- diff(x = df$sheep, lag = 1, differences = 2)
+df_2$detrend_wolves <- diff(x = df$wolves, lag = 1, differences = 2)
+df_2$detrend_grass <- diff(x = df$grass, lag = 1, differences = 2)
 colnames(df_2) <- c('Detrended Sheep Values', 'Detrended Wolves Values', 'Detrended Grass Values')
-
-ggplot(data = df_2, aes(x = 1:4999, y = `Detrended Sheep Values`)) +
-  geom_line() +
-  xlab('Time') +
-  ylab('Value') +
-  ggtitle('Detrended Sheep Plot')
-
-ggplot(data = df_2, aes(x = 1:4999, y = `Detrended Wolves Values`)) +
-  geom_line() +
-  xlab('Time') +
-  ylab('Value') +
-  ggtitle('Detrended Wolves Plot')
-
-ggplot(data = df_2, aes(x = 1:4999, y = `Detrended Grass Values`)) +
-  geom_line() +
-  xlab('Time') +
-  ylab('Value') +
-  ggtitle('Detrended Grass Plot')
 
 
 # Change Point Analysis (CPA) ---------------------------------------------
