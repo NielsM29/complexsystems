@@ -1,9 +1,17 @@
+set.seed(29)
+
+
+# Loading packages --------------------------------------------------------
+
 library(dplyr)
 library(ggplot2)
 library(grid)
 library(tiger)
 library(pracma)
 library(scales)
+
+
+# Loading dataset ---------------------------------------------------------
 
 # Import wolf_sheep_grasspredation.csv
 df <- read.csv("wolf_sheep_grasspredation.csv", header = 1, skip = 23, col.names = c('', 'time', 'sheep', 'wolves', 'grass'))
