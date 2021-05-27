@@ -5,11 +5,8 @@ set.seed(29)
 #Required packages
 library(nonlinearTseries)
 library(ifultools)
-library(DFA)
-library(jsonlite)
 library(zoo)
 library(MFDFA)
-library(glue)
 library(ggplot2)
 library(ggpubr)
 

@@ -91,11 +91,12 @@ df_2$detrend_sheep <- NA
 df_2$detrend_wolves <- NA
 df_2$detrend_grass <- NA
 df_2[,1] <- NULL
-colnames(df_2) <- c('Detrended Sheep Values', 'Detrended Wolves Values', 'Detrended Grass Values')
 
 df_2$detrend_sheep <- diff(x = df_1$sheep, lag = 1, differences = 2)
 df_2$detrend_wolves <- diff(x = df_1$wolves, lag = 1, differences = 2)
 df_2$detrend_grass <- diff(x = df_1$grass, lag = 1, differences = 2)
+
+colnames(df_2) <- c('Detrended Sheep Values', 'Detrended Wolves Values', 'Detrended Grass Values')
 
 ggplot(data = df_2, aes(x = 1:4999, y = `Detrended Sheep Values`)) +
   geom_line() +
